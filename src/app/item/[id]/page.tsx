@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!i) return { title: "Item" };
   const title = `Found: ${itemTitle(i)}`;
   const description = `Found at ${locLabel(i.found_loc)}. ${i.holding === "hub" ? `Kept at ${i.hub_name}` : i.holding === "left" ? "Left where it was found" : "With the person who found it"}. See how to collect it.`;
-  return { title, description, openGraph: { title, description, images: i.photo_url?.startsWith("http") ? [i.photo_url] : [] } };
+  return { title, description, openGraph: { title, description, images: i.photo_url && !i.photo_url.startsWith("data:") ? [i.photo_url] : [] } };
 }
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<SP> }) {

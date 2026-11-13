@@ -38,9 +38,16 @@ export async function currentHub(): Promise<Hub | null> {
 export async function storePhoto(file: File | null, id: string): Promise<string | null> {
   if (!file || file.size === 0 || file.size > 4_000_000 || !file.type.startsWith("image/")) return null;
   if (process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID) {
+    const { put } = await import("@vercel/blob");
+    const path = `items/${id}.jpg`;
     try {
-      const { put } = await import("@vercel/blob");
-      const r = await put(`items/${id}.jpg`, file, { access: "public", addRandomSuffix: true, contentType: file.type });
+      const r = await put(path, file, { access: "private", addRandomSuffix: true, contentType: file.type });
+      return `/photo/${r.pathname}`;
+    } catch (e) {
+      if (!String(e).includes("private access on a public store")) { console.error("photo upload failed", e); return null; }
+    }
+    try {
+      const r = await put(path, file, { access: "public", addRandomSuffix: true, contentType: file.type });
       return r.url;
     } catch (e) {
       console.error("photo upload failed", e);
