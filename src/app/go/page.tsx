@@ -33,7 +33,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ l
       {items.length > 0 && (
         <>
           <h2 className="mt-7 text-xl font-bold">Found here recently</h2>
-          <div className="mt-3 grid grid-cols-2 gap-3">{items.map((i) => <ItemCard key={i.id} i={i} />)}</div>
+          <div className="mt-3 grid grid-cols-2 gap-2.5">{items.map((i) => <ItemCard key={i.id} i={i} />)}</div>
         </>
       )}
       <p className="mt-6 text-center"><Link href="/" className="font-semibold text-banyan underline">See everything found on campus</Link></p>

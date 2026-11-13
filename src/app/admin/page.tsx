@@ -75,7 +75,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ w
         {hubs.map((h) => (
           <li key={h.id} className={`rounded-2xl bg-paper p-4 ${h.active ? "" : "opacity-60"}`}>
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="font-bold">{h.name} <span className="font-normal text-muted">({locLabel(h.loc)})</span></p>
+              <p className="min-w-0 break-words font-bold">{h.name} <span className="font-normal text-muted">({locLabel(h.loc)})</span></p>
               <div className="flex flex-wrap gap-2">
                 <CopyButton text={`${base}/h/${h.token}`} label="Copy private link" />
                 <Link href={`/poster?hub=${h.id}`} className="btn btn-ghost">Poster</Link>
@@ -83,9 +83,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ w
             </div>
             <p className="mt-2 break-all rounded-lg bg-mist px-3 py-2 font-mono text-[13px]" data-desk-link>{base}/h/{h.token}</p>
             <details className="mt-2">
-              <summary className="cursor-pointer text-sm font-semibold text-banyan">Edit details</summary>
+              <summary className="flex min-h-11 cursor-pointer items-center text-[15px] font-semibold text-banyan">Edit details</summary>
               <form action={saveHub} className="mt-3 space-y-2"><HubFields h={h} /><button className="btn btn-primary">Save</button></form>
-              <form action={toggleHub} className="mt-2"><input type="hidden" name="id" value={h.id} /><button className="text-sm text-muted underline">{h.active ? "Remove from the public list" : "Put back on the public list"}</button></form>
+              <form action={toggleHub} className="mt-2"><input type="hidden" name="id" value={h.id} /><button className="min-h-11 text-[15px] text-muted underline">{h.active ? "Remove from the public list" : "Put back on the public list"}</button></form>
             </details>
           </li>
         ))}
@@ -99,10 +99,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ w
       <h2 className="mt-10 text-xl font-bold">Recent found posts</h2>
       <ul className="mt-2 divide-y divide-line rounded-2xl bg-paper px-4">
         {items.map((i) => (
-          <li key={i.id} className="flex items-center justify-between gap-3 py-2.5 text-[15px]">
-            <Link href={`/item/${i.id}`} className="min-w-0 flex-1 truncate"><b>{i.title}</b> <span className="text-muted">{i.status}, {ago(i.created_at)}</span></Link>
+          <li key={i.id} className="flex min-h-12 items-center justify-between gap-3 py-1.5 text-[15px]">
+            <Link href={`/item/${i.id}`} className="min-w-0 flex-1 truncate py-3"><b>{i.title}</b> <span className="text-muted">{i.status}, {ago(i.created_at)}</span></Link>
             {i.status !== "returned" && (
-              <form action={setItemHidden}><input type="hidden" name="id" value={i.id} /><input type="hidden" name="hide" value={i.status === "hidden" ? "0" : "1"} /><button className="text-sm font-semibold text-coral underline">{i.status === "hidden" ? "Unhide" : "Hide"}</button></form>
+              <form action={setItemHidden}><input type="hidden" name="id" value={i.id} /><input type="hidden" name="hide" value={i.status === "hidden" ? "0" : "1"} /><button className="min-h-11 px-2 text-[15px] font-semibold text-coral underline">{i.status === "hidden" ? "Unhide" : "Hide"}</button></form>
             )}
           </li>
         ))}
@@ -112,9 +112,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ w
       <h2 className="mt-10 text-xl font-bold">Open lost reports</h2>
       <ul className="mt-2 divide-y divide-line rounded-2xl bg-paper px-4">
         {lost.map((l) => (
-          <li key={l.id} className="flex items-center justify-between gap-3 py-2.5 text-[15px]">
-            <Link href={`/lost/${l.id}`} className="min-w-0 flex-1 truncate"><b>{l.title}</b> <span className="text-muted">{ago(l.created_at)}</span></Link>
-            <form action={adminCloseLost}><input type="hidden" name="id" value={l.id} /><button className="text-sm font-semibold text-coral underline">Close</button></form>
+          <li key={l.id} className="flex min-h-12 items-center justify-between gap-3 py-1.5 text-[15px]">
+            <Link href={`/lost/${l.id}`} className="min-w-0 flex-1 truncate py-3"><b>{l.title}</b> <span className="text-muted">{ago(l.created_at)}</span></Link>
+            <form action={adminCloseLost}><input type="hidden" name="id" value={l.id} /><button className="min-h-11 px-2 text-[15px] font-semibold text-coral underline">Close</button></form>
           </li>
         ))}
         {lost.length === 0 && <li className="py-3 text-muted">None open.</li>}

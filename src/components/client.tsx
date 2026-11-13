@@ -30,7 +30,7 @@ export function SearchBar({ placeholder }: { placeholder: string }) {
       <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-banyan" />
       <input
         value={v} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} aria-label="Search" enterKeyHint="search"
-        className="w-full rounded-2xl border-2 border-transparent bg-paper py-4 pl-12 pr-12 text-[17px] font-medium text-ink shadow-[0_8px_24px_-14px_rgba(13,42,31,0.7)] placeholder:font-normal placeholder:text-[#8b9a92] focus:border-marigold focus:outline-none"
+        className="w-full rounded-2xl border-2 border-transparent bg-paper py-3.5 pl-12 pr-12 text-[17px] sm:py-4 font-medium text-ink shadow-[0_8px_24px_-14px_rgba(13,42,31,0.7)] placeholder:font-normal placeholder:text-[#8b9a92] focus:border-marigold focus:outline-none"
       />
       {pending ? (
         <Loader2 className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 animate-spin text-muted" />
@@ -82,7 +82,7 @@ export function MyPosts() {
       <ul className="mt-2 divide-y divide-line">
         {posts.slice(0, 5).map((p) => (
           <li key={p.id}>
-            <Link href={p.t === "found" ? `/item/${p.id}?k=${p.k}` : `/lost/${p.id}?k=${p.k}`} className="flex items-center justify-between gap-3 py-2.5 text-[15px]">
+            <Link href={p.t === "found" ? `/item/${p.id}?k=${p.k}` : `/lost/${p.id}?k=${p.k}`} className="flex min-h-11 items-center justify-between gap-3 py-2 text-[15px]">
               <span className="truncate font-semibold">{p.title}</span>
               <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold ${p.t === "found" ? "bg-marigold-soft text-banyan-deep" : "bg-coral-soft text-coral"}`}>
                 {p.t === "found" ? "You found" : "You lost"}
@@ -116,8 +116,8 @@ export function Feedback({ ctx }: { ctx: string }) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="font-bold">Is InstiFound making this easier?</p>
           <div className="flex gap-2">
-            <button type="button" className="btn btn-ghost !px-4 !py-2" onClick={() => { setHelped(true); setState("note"); }}><ThumbsUp className="h-4 w-4" /> Yes</button>
-            <button type="button" className="btn btn-ghost !px-4 !py-2" onClick={() => { setHelped(false); setState("note"); }}><ThumbsDown className="h-4 w-4" /> No</button>
+            <button type="button" className="btn btn-ghost min-h-11 !px-4 !py-2" onClick={() => { setHelped(true); setState("note"); }}><ThumbsUp className="h-4 w-4" /> Yes</button>
+            <button type="button" className="btn btn-ghost min-h-11 !px-4 !py-2" onClick={() => { setHelped(false); setState("note"); }}><ThumbsDown className="h-4 w-4" /> No</button>
           </div>
         </div>
       ) : (

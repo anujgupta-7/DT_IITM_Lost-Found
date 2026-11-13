@@ -31,7 +31,7 @@ export default async function Page() {
                 {h.ask && <li className="flex gap-2"><UserRound className="mt-0.5 h-4 w-4 shrink-0 text-banyan" /> {h.ask}</li>}
               </ul>
             </div>
-            <Link href={`/?hub=${h.id}`} className="tag-stub bg-marigold-soft text-sm font-bold text-banyan-deep">
+            <Link href={`/?hub=${h.id}`} className="tag-stub flex min-h-12 items-center bg-marigold-soft text-[15px] font-bold text-banyan-deep">
               {n(h.id) ? `See ${n(h.id)} item${n(h.id) === 1 ? "" : "s"} kept here` : "Nothing listed here right now"}
             </Link>
           </article>

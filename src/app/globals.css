@@ -82,6 +82,16 @@ h1, h2, h3, .display { font-family: var(--font-display); letter-spacing: -0.02em
   .btn { transition: none; }
 }
 
+.backlink {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 44px; margin-left: -8px; padding: 0 8px;
+  font-size: 15px; font-weight: 600; color: var(--color-muted); border-radius: 10px;
+}
+.backlink:hover { color: var(--color-ink); }
+
+html { scroll-padding-bottom: 96px; }
+button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+input[type="date"] { min-height: 50px; -webkit-appearance: none; appearance: none; }
+
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 

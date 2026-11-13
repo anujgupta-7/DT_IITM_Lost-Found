@@ -44,7 +44,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
   return (
     <main className="mx-auto max-w-xl px-4 pb-16 pt-4">
-      <Link href={atDesk ? "/desk" : "/"} className="inline-flex items-center gap-1 text-sm font-semibold text-muted"><ArrowLeft className="h-4 w-4" /> {atDesk ? "Back to your desk" : "All found items"}</Link>
+      <Link href={atDesk ? "/desk" : "/"} className="backlink"><ArrowLeft className="h-4 w-4" /> {atDesk ? "Back to your desk" : "All found items"}</Link>
 
       {sp.new && manager && (
         <section className="pop-in mt-3 rounded-2xl bg-leaf p-5 text-white">
@@ -71,17 +71,17 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       {sp.thanked && <p className="pop-in mt-3 rounded-2xl bg-leaf-soft p-4 font-semibold text-leaf">Your thanks is on its way to the finder.</p>}
 
       <article className="tag mt-3">
-        <div className={`relative flex items-center justify-center ${i.photo_url ? "bg-ink" : "aspect-[16/9] bg-banyan/[0.06]"}`}>
+        <div className={`relative flex items-center justify-center ${i.photo_url ? "bg-ink" : "aspect-[3/1] bg-banyan/[0.06] sm:aspect-[16/9]"}`}>
           {i.photo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={i.photo_url} alt={title} className={`max-h-[60vh] w-full object-contain ${returned ? "opacity-70 grayscale" : ""}`} />
+            <img src={i.photo_url} alt={title} className={`max-h-[55vh] w-full object-contain ${returned ? "opacity-70 grayscale" : ""}`} />
           ) : (
-            <CatIcon id={i.category} className="h-20 w-20 text-banyan/40" />
+            <CatIcon id={i.category} className="h-14 w-14 text-banyan/40 sm:h-20 sm:w-20" />
           )}
         </div>
         <div className="p-4 sm:p-5">
           <p className="text-sm font-semibold text-muted">{catLabel(i.category)}</p>
-          <h1 className="text-[28px] font-extrabold leading-tight">{title}</h1>
+          <h1 className="break-words text-[26px] font-extrabold leading-tight sm:text-[28px]">{title}</h1>
           <p className="mt-2 flex items-start gap-2 text-[15px] text-muted">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
             <span>Found at {locLabel(i.found_loc)}{i.found_detail ? `, ${i.found_detail}` : ""} {fmtDay(i.found_on)}. Posted {ago(i.created_at)}.</span>
@@ -101,7 +101,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             <p className="text-sm font-bold text-muted">Where it is now</p>
             {i.holding === "hub" && (
               <>
-                <p className="display mt-0.5 flex items-center gap-2 text-2xl font-extrabold text-banyan-deep"><Building2 className="h-6 w-6 shrink-0" /> {i.hub_name}</p>
+                <p className="display mt-0.5 flex items-start gap-2 text-2xl font-extrabold leading-tight text-banyan-deep"><Building2 className="mt-0.5 h-6 w-6 shrink-0" /> {i.hub_name}</p>
                 <ul className="mt-3 space-y-2 text-[16px]">
                   {i.hub_place && <li className="flex gap-2"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-banyan" /> {i.hub_place}</li>}
                   {i.hub_hours && <li className="flex gap-2"><Clock className="mt-0.5 h-5 w-5 shrink-0 text-banyan" /> {i.hub_hours}</li>}
@@ -114,7 +114,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             )}
             {i.holding === "left" && (
               <>
-                <p className="display mt-0.5 flex items-center gap-2 text-2xl font-extrabold text-banyan-deep"><MapPin className="h-6 w-6 shrink-0" /> Left where it was found</p>
+                <p className="display mt-0.5 flex items-start gap-2 text-2xl font-extrabold leading-tight text-banyan-deep"><MapPin className="mt-0.5 h-6 w-6 shrink-0" /> Left where it was found</p>
                 <p className="mt-2 text-[16px]">{locLabel(i.found_loc)}{i.found_detail ? `, ${i.found_detail}` : ""}{i.left_note ? `. ${i.left_note}` : ""}</p>
                 <form action={markReturned} className="mt-4">
                   <input type="hidden" name="id" value={i.id} />
@@ -125,7 +125,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             )}
             {i.holding === "finder" && (
               <>
-                <p className="display mt-0.5 flex items-center gap-2 text-2xl font-extrabold text-banyan-deep"><Hand className="h-6 w-6 shrink-0" /> With the person who found it</p>
+                <p className="display mt-0.5 flex items-start gap-2 text-2xl font-extrabold leading-tight text-banyan-deep"><Hand className="mt-0.5 h-6 w-6 shrink-0" /> With the person who found it</p>
                 {!owner && (
                   <details className="mt-3" open={false}>
                     <summary className="btn btn-primary w-full cursor-pointer list-none">This is mine</summary>
@@ -188,13 +188,13 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
       {!returned && (
         <div className="mt-4 flex flex-wrap gap-2">
-          <a href={wa} target="_blank" rel="noopener" className="btn btn-wa flex-1"><MessageCircle className="h-5 w-5" /> Share on WhatsApp</a>
-          <CopyButton text={url} />
+          <a href={wa} target="_blank" rel="noopener" className="btn btn-wa flex-1 whitespace-nowrap"><MessageCircle className="h-5 w-5" /> Share on WhatsApp</a>
+          <CopyButton text={url} label="Copy" />
         </div>
       )}
 
       <div className="mt-6"><Feedback ctx={`item:${i.id}`} /></div>
-      <p className="mt-4 text-center text-sm text-muted">
+      <p className="mt-4 text-center text-[15px] leading-relaxed text-muted">
         Not yours? <Link href="/" className="underline">See everything found</Link> or <Link href={`/lost/new?cat=${i.category}`} className="underline">post a lost report</Link>.
       </p>
     </main>

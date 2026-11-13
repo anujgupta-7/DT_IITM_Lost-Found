@@ -43,17 +43,17 @@ export function ItemCard({ i }: { i: Item }) {
           </span>
         )}
       </div>
-      <div className="px-3.5 pb-3 pt-3">
-        <p className="display text-[17px] font-bold leading-snug text-ink line-clamp-2">{itemTitle(i)}</p>
-        <p className="mt-1 text-[13px] leading-snug text-muted">
+      <div className="px-3 pb-3 pt-2.5 sm:px-3.5 sm:pt-3">
+        <p className="display text-[16px] font-bold leading-snug text-ink line-clamp-2 break-words sm:text-[17px]">{itemTitle(i)}</p>
+        <p className="mt-1 text-[13px] leading-snug text-muted line-clamp-2">
           Found at {locLabel(i.found_loc)} {fmtDay(i.found_on)}
         </p>
       </div>
       <div className={`tag-stub ${returned ? "bg-leaf-soft" : "bg-marigold-soft"}`}>
-        <p className="text-[11px] font-semibold text-muted">{returned ? "Back with its owner" : "Where it is now"}</p>
-        <p className="flex items-center gap-1.5 text-sm font-bold text-banyan-deep">
-          {returned ? <Check className="h-4 w-4 shrink-0" /> : i.holding === "finder" ? <Hand className="h-4 w-4 shrink-0" /> : i.holding === "hub" ? <Building2 className="h-4 w-4 shrink-0" /> : <MapPin className="h-4 w-4 shrink-0" />}
-          <span className="truncate">{returned ? "Returned " + ago(i.returned_at ?? i.created_at) : whereNowShort(i)}</span>
+        <p className="text-xs font-semibold text-muted">{returned ? "Back with its owner" : "Where it is now"}</p>
+        <p className="mt-0.5 flex items-start gap-1.5 text-sm font-bold leading-tight text-banyan-deep">
+          {returned ? <Check className="mt-px h-4 w-4 shrink-0" /> : i.holding === "finder" ? <Hand className="mt-px h-4 w-4 shrink-0" /> : i.holding === "hub" ? <Building2 className="mt-px h-4 w-4 shrink-0" /> : <MapPin className="mt-px h-4 w-4 shrink-0" />}
+          <span className="line-clamp-2">{returned ? "Returned " + ago(i.returned_at ?? i.created_at) : whereNowShort(i)}</span>
         </p>
       </div>
     </Link>

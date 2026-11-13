@@ -31,17 +31,17 @@ export default async function Home({ searchParams }: { searchParams: Promise<SP>
 
   return (
     <>
-      <section className="bg-banyan pb-7 pt-3 text-white">
+      <section className="bg-banyan pb-5 pt-1 text-white sm:pb-7 sm:pt-3">
         <div className="mx-auto max-w-5xl px-4">
-          <h1 className="max-w-xl text-[30px] font-extrabold leading-[1.08] sm:text-[44px]">
+          <h1 className="max-w-xl text-[25px] font-extrabold leading-[1.1] sm:text-[44px] sm:leading-[1.08]">
             Someone on campus is probably keeping it safe.
           </h1>
-          <p className="mt-2 max-w-lg text-[16px] text-white/80 sm:text-lg">
+          <p className="mt-1.5 max-w-lg text-[15px] leading-snug text-white/80 sm:mt-2 sm:text-lg">
             Search what&rsquo;s been found at IIT Madras and see exactly where to collect it.
           </p>
-          <div className="mt-5 max-w-2xl">
+          <div className="mt-4 max-w-2xl sm:mt-5">
             <Suspense>
-              <SearchBar placeholder="Search: bottle, Narmada, MS25A012" />
+              <SearchBar placeholder="Bottle, hostel, roll no." />
             </Suspense>
           </div>
           <div className="mt-4 hidden max-w-2xl grid-cols-2 gap-3 sm:grid">
@@ -51,7 +51,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<SP>
         </div>
       </section>
 
-      <main className="mx-auto max-w-5xl px-4 pb-32 pt-5 sm:pb-16">
+      <main className="mx-auto max-w-5xl px-4 pb-36 pt-4 sm:pb-16 sm:pt-5">
         {desk && (
           <Link href="/desk" className="mb-5 flex items-center gap-3 rounded-2xl bg-marigold px-4 py-3 font-bold text-banyan-deep">
             <Building2 className="h-5 w-5 shrink-0" />
@@ -62,12 +62,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<SP>
 
         <div className="flex items-center gap-2" role="tablist">
           <Link role="tab" aria-selected={tab === "found"} href={href(sp, { tab: undefined })}
-            className={`rounded-full px-4 py-2 text-[15px] font-bold ${tab === "found" ? "bg-banyan text-white" : "bg-paper text-ink"}`}>
+            className={`flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[15px] font-bold ${tab === "found" ? "bg-banyan text-white" : "bg-paper text-ink"}`}>
             Found <span className="opacity-70">{items.filter((i) => i.status === "open").length}</span>
           </Link>
           <Link role="tab" aria-selected={tab === "lost"} href={href(sp, { tab: "lost", area: undefined, hub: undefined })}
-            className={`rounded-full px-4 py-2 text-[15px] font-bold ${tab === "lost" ? "bg-coral text-white" : "bg-paper text-ink"}`}>
-            People are looking for <span className="opacity-70">{lost.length}</span>
+            className={`flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[15px] font-bold ${tab === "lost" ? "bg-coral text-white" : "bg-paper text-ink"}`}>
+            <span className="sm:hidden">Looking for</span><span className="hidden sm:inline">People are looking for</span> <span className="opacity-70">{lost.length}</span>
           </Link>
         </div>
 
@@ -76,7 +76,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<SP>
             const on = sp.cat === c.id;
             return (
               <Link key={c.id} href={href(sp, { cat: on ? undefined : c.id })}
-                className={`flex shrink-0 items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 text-sm font-semibold ${on ? "border-banyan bg-leaf-soft text-banyan-deep" : "border-line bg-paper text-ink"}`}>
+                className={`flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border-[1.5px] px-3.5 text-sm font-semibold ${on ? "border-banyan bg-leaf-soft text-banyan-deep" : "border-line bg-paper text-ink"}`}>
                 <CatIcon id={c.id} className="h-4 w-4" /> {c.label}
               </Link>
             );
@@ -89,13 +89,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<SP>
               const on = sp.area === g;
               return (
                 <Link key={g} href={href(sp, { area: on ? undefined : g })}
-                  className={`shrink-0 rounded-full px-3 py-1.5 font-semibold ${on ? "bg-ink text-white" : "text-muted hover:text-ink"}`}>
+                  className={`flex min-h-10 shrink-0 items-center rounded-full px-3 font-semibold ${on ? "bg-ink text-white" : "text-muted hover:text-ink"}`}>
                   {g}
                 </Link>
               );
             })}
             {filterHub && (
-              <Link href={href(sp, { hub: undefined })} className="shrink-0 rounded-full bg-ink px-3 py-1.5 font-semibold text-white">
+              <Link href={href(sp, { hub: undefined })} className="flex min-h-10 shrink-0 items-center rounded-full bg-ink px-3 font-semibold text-white">
                 Kept at {filterHub.name} ×
               </Link>
             )}
@@ -105,7 +105,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<SP>
         <div className="mt-4">
           {tab === "found" ? (
             items.length ? (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
                 {items.map((i) => <ItemCard key={i.id} i={i} />)}
               </div>
             ) : filtered ? (
@@ -132,18 +132,18 @@ export default async function Home({ searchParams }: { searchParams: Promise<SP>
           )}
         </div>
 
-        <footer className="mt-10 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">
-          <Link href="/desks" className="underline">Where found things are kept</Link>
-          <Link href="/poster" className="underline">Print a QR poster</Link>
-          <Link href="/impact" className="underline">Impact so far</Link>
-          <span>A Design Thinking project at DoMS, IIT Madras</span>
+        <footer className="mt-10 flex flex-col gap-1 text-[15px] text-muted sm:flex-row sm:flex-wrap sm:gap-x-5">
+          <Link href="/desks" className="py-2 underline">Where found things are kept</Link>
+          <Link href="/poster" className="py-2 underline">Print a QR poster</Link>
+          <Link href="/impact" className="py-2 underline">Impact so far</Link>
+          <span className="pt-2 text-sm">A Design Thinking project at DoMS, IIT Madras</span>
         </footer>
       </main>
 
       <div className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 backdrop-blur sm:hidden">
         <div className="mx-auto grid max-w-md grid-cols-2 gap-2">
-          <Link href="/found/new" className="btn btn-gold !px-2 text-[15px]">I found something</Link>
-          <Link href="/lost/new" className="btn btn-primary !px-2 text-[15px]">I lost something</Link>
+          <Link href="/found/new" className="btn btn-gold min-h-12 whitespace-nowrap !px-1 text-[15px]">I found something</Link>
+          <Link href="/lost/new" className="btn btn-primary min-h-12 whitespace-nowrap !px-1 text-[15px]">I lost something</Link>
         </div>
       </div>
     </>

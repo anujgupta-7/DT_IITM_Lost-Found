@@ -14,7 +14,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ l
   const lite = hubs.map((h) => ({ id: h.id, name: h.name, loc: h.loc, place: h.place }));
   return (
     <main className="mx-auto max-w-xl px-4 pb-16 pt-4">
-      <Link href={desk ? "/desk" : "/"} className="inline-flex items-center gap-1 text-sm font-semibold text-muted"><ArrowLeft className="h-4 w-4" /> Back</Link>
+      <Link href={desk ? "/desk" : "/"} className="backlink"><ArrowLeft className="h-4 w-4" /> Back</Link>
       <h1 className="mt-2 text-3xl font-extrabold">You found something</h1>
       <p className="mb-4 mt-1 text-muted">Takes about 30 seconds. No sign in.</p>
       <FoundForm

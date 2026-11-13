@@ -41,17 +41,17 @@ export default async function Page() {
         {open.map((i) => (
           <li key={i.id}>
             <Link href={`/item/${i.id}`} className="flex items-center gap-3 rounded-2xl bg-paper p-2.5">
-              <span className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-mist">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-mist">
                 {i.photo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={i.photo_url} alt="" className="h-full w-full object-cover" />
                 ) : <CatIcon id={i.category} className="h-7 w-7 text-banyan/60" />}
               </span>
               <span className="min-w-0 flex-1">
-                <b className="block truncate">{itemTitle(i)}</b>
+                <b className="line-clamp-2 break-words leading-snug">{itemTitle(i)}</b>
                 <span className="text-sm text-muted">Logged {ago(i.created_at)}</span>
               </span>
-              <span className="btn btn-primary shrink-0 !px-3 !py-2 text-sm"><Check className="h-4 w-4" /> Hand over</span>
+              <span className="btn btn-primary min-h-11 shrink-0 !px-3 !py-2 text-sm" aria-label="Hand over"><Check className="h-4 w-4" /><span className="hidden min-[380px]:inline">Hand over</span></span>
             </Link>
           </li>
         ))}
@@ -70,15 +70,15 @@ export default async function Page() {
           <h2 className="mt-8 text-xl font-bold">Returned recently <span className="text-muted">{done.length}</span></h2>
           <ul className="mt-2 divide-y divide-line rounded-2xl bg-paper px-4">
             {done.map((i) => (
-              <li key={i.id}><Link href={`/item/${i.id}`} className="flex justify-between gap-3 py-3 text-[15px]"><span className="truncate font-semibold">{itemTitle(i)}</span><span className="shrink-0 text-leaf">{ago(i.returned_at ?? i.created_at)}</span></Link></li>
+              <li key={i.id}><Link href={`/item/${i.id}`} className="flex min-h-12 items-center justify-between gap-3 py-2 text-[15px]"><span className="line-clamp-2 font-semibold">{itemTitle(i)}</span><span className="shrink-0 text-leaf">{ago(i.returned_at ?? i.created_at)}</span></Link></li>
             ))}
           </ul>
         </>
       )}
 
-      <div className="mt-10 flex flex-wrap items-center gap-3 text-sm">
-        <Link href={`/poster?hub=${hub.id}`} className="btn btn-ghost !py-2"><Printer className="h-4 w-4" /> Print the desk poster</Link>
-        <form action={hubLogout}><button className="text-muted underline">Sign this phone out of the desk</button></form>
+      <div className="mt-10 flex flex-col items-start gap-2 text-[15px]">
+        <Link href={`/poster?hub=${hub.id}`} className="btn btn-ghost min-h-11 !py-2"><Printer className="h-4 w-4" /> Print the desk poster</Link>
+        <form action={hubLogout}><button className="min-h-11 text-muted underline">Sign this phone out of the desk</button></form>
       </div>
     </main>
   );

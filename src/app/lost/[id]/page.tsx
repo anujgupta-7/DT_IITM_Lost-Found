@@ -30,7 +30,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
   return (
     <main className="mx-auto max-w-xl px-4 pb-16 pt-4">
-      <Link href="/?tab=lost" className="inline-flex items-center gap-1 text-sm font-semibold text-muted"><ArrowLeft className="h-4 w-4" /> Lost reports</Link>
+      <Link href="/?tab=lost" className="backlink"><ArrowLeft className="h-4 w-4" /> Lost reports</Link>
 
       {sp.new && mine && (
         <section className="pop-in mt-3 rounded-2xl bg-banyan p-5 text-white">
@@ -53,7 +53,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-coral-soft"><CatIcon id={l.category} className="h-8 w-8 text-coral" /></span>
           <div>
             <p className="text-sm font-semibold text-coral">{open ? "Someone is looking for this" : "Closed"}</p>
-            <h1 className="text-[26px] font-extrabold leading-tight">{l.title}</h1>
+            <h1 className="break-words text-[24px] font-extrabold leading-tight sm:text-[26px]">{l.title}</h1>
             <p className="mt-1 flex items-start gap-2 text-[15px] text-muted">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{catLabel(l.category)}, lost near {locLabel(l.lost_loc)}{l.lost_detail ? `, ${l.lost_detail}` : ""} {fmtDay(l.lost_on)}. Posted {ago(l.created_at)}.</span>
@@ -81,7 +81,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           <section className="mt-5">
             <h2 className="text-xl font-bold">{matches.length ? "Could one of these be yours?" : "Nothing matching has been found yet"}</h2>
             {matches.length ? (
-              <div className="mt-3 grid grid-cols-2 gap-3">{matches.map((i) => <ItemCard key={i.id} i={i} />)}</div>
+              <div className="mt-3 grid grid-cols-2 gap-2.5">{matches.map((i) => <ItemCard key={i.id} i={i} />)}</div>
             ) : (
               <p className="mt-1 text-muted">
                 That&rsquo;s normal in the first day or two. Meanwhile, <Link href="/desks" className="font-semibold text-banyan underline">check where found things are kept</Link> near where you lost it.
@@ -89,8 +89,8 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             )}
           </section>
           <div className="mt-5 flex flex-wrap gap-2">
-            <a href={wa} target="_blank" rel="noopener" className="btn btn-wa flex-1"><MessageCircle className="h-5 w-5" /> Share on WhatsApp</a>
-            <CopyButton text={url} />
+            <a href={wa} target="_blank" rel="noopener" className="btn btn-wa flex-1 whitespace-nowrap"><MessageCircle className="h-5 w-5" /> Share on WhatsApp</a>
+            <CopyButton text={url} label="Copy" />
           </div>
           <form action={closeLost} className="mt-3">
             <input type="hidden" name="id" value={l.id} /><input type="hidden" name="k" value={sp.k ?? ""} />
