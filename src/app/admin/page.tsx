@@ -5,9 +5,9 @@ import { listHubs } from "@/lib/repo";
 import { adminConfigured, isAdmin, siteUrl } from "@/lib/server";
 import { mailConfigured } from "@/lib/mail";
 import { ago } from "@/lib/util";
-import type { Hub, Item } from "@/lib/types";
+import type { Hub, Item, Lost } from "@/lib/types";
 import { CopyButton } from "@/components/client";
-import { adminLogin, saveHub, setItemHidden, toggleHub } from "@/app/actions";
+import { adminCloseLost, adminLogin, saveHub, setItemHidden, toggleHub } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin" };
@@ -50,11 +50,12 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ w
       </main>
     );
   }
-  const [hubs, items, feedback, mails] = await Promise.all([
+  const [hubs, items, feedback, mails, lost] = await Promise.all([
     listHubs(true),
     q<Item>("select * from items order by created_at desc limit 60"),
     q<{ id: string; helped: boolean; note: string; ctx: string; created_at: number }>("select * from feedback order by created_at desc limit 60"),
     q<{ n: number; ok: number }>("select count(*)::int as n, count(*) filter (where ok)::int as ok from mail_log"),
+    q<Lost>("select * from lost where status = 'open' order by created_at desc limit 60"),
   ]);
   const base = siteUrl();
   const pill = (ok: boolean, yes: string, no: string) => <span className={`rounded-full px-3 py-1 text-sm font-bold ${ok ? "bg-leaf-soft text-leaf" : "bg-coral-soft text-coral"}`}>{ok ? yes : no}</span>;
@@ -106,6 +107,17 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ w
           </li>
         ))}
         {items.length === 0 && <li className="py-3 text-muted">None yet.</li>}
+      </ul>
+
+      <h2 className="mt-10 text-xl font-bold">Open lost reports</h2>
+      <ul className="mt-2 divide-y divide-line rounded-2xl bg-paper px-4">
+        {lost.map((l) => (
+          <li key={l.id} className="flex items-center justify-between gap-3 py-2.5 text-[15px]">
+            <Link href={`/lost/${l.id}`} className="min-w-0 flex-1 truncate"><b>{l.title}</b> <span className="text-muted">{ago(l.created_at)}</span></Link>
+            <form action={adminCloseLost}><input type="hidden" name="id" value={l.id} /><button className="text-sm font-semibold text-coral underline">Close</button></form>
+          </li>
+        ))}
+        {lost.length === 0 && <li className="py-3 text-muted">None open.</li>}
       </ul>
 
       <h2 className="mt-10 text-xl font-bold">Feedback</h2>

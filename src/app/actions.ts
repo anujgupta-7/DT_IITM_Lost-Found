@@ -192,6 +192,13 @@ export async function setItemHidden(fd: FormData) {
   redirect("/admin");
 }
 
+export async function adminCloseLost(fd: FormData) {
+  if (!(await isAdmin())) return;
+  await q("update lost set status = 'closed', closed_at = $2 where id = $1 and status = 'open'", [clip(fd.get("id"), 20), Date.now()]);
+  revalidatePath("/");
+  redirect("/admin");
+}
+
 export async function hubLogout() {
   (await cookies()).delete("if_hub");
   redirect("/");
