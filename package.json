@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "instifound",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,11 +14,11 @@
     "@neondatabase/serverless": "^1.2.0",
     "@vercel/blob": "^2.9.0",
     "lucide-react": "^1.72.0",
-    "next": "15.5.4",
+    "next": "15.5.29",
     "nodemailer": "^10.5.0",
     "qrcode": "^1.5.4",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.1.10",
+    "react-dom": "19.1.10",
     "server-only": "^0.0.1"
   },
   "devDependencies": {
@@ -31,7 +31,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.5.4",
+    "eslint-config-next": "15.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
