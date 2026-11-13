@@ -14,6 +14,8 @@ import type { Item } from "@/lib/types";
 
 type Result = { error: string } | void;
 
+const meaningful = (s: string) => (s.match(/[a-z0-9]/gi) ?? []).length >= 3;
+
 const validDay = (s: string) => (/^\d{4}-\d{2}-\d{2}$/.test(s) && s <= todayIST() ? s : todayIST());
 
 export async function createFound(fd: FormData): Promise<Result> {
@@ -24,7 +26,7 @@ export async function createFound(fd: FormData): Promise<Result> {
   if (category === "id" && clip(fd.get("roll"), 12) && !roll) return { error: "That roll number doesn't look right. It should look like MS25A012." };
   let title = clip(fd.get("title"), 80);
   if (category === "id" && !title) title = "ID card";
-  if (!title) return { error: "Add a short description, like \"Black Milton bottle\"." };
+  if (!meaningful(title)) return { error: "Add a short description, like \"Black Milton bottle\"." };
   const found_loc = clip(fd.get("found_loc"), 30);
   if (!locOf(found_loc)) return { error: "Pick where you found it." };
 
@@ -73,7 +75,7 @@ export async function createLost(fd: FormData): Promise<Result> {
   const category = clip(fd.get("category"), 20);
   if (!CATEGORIES.some((c) => c.id === category)) return { error: "Pick what kind of item it is." };
   const title = clip(fd.get("title"), 80);
-  if (!title) return { error: "Add a short description, like \"Blue Wildcraft backpack\"." };
+  if (!meaningful(title)) return { error: "Add a short description, like \"Blue Wildcraft backpack\"." };
   const lost_loc = clip(fd.get("lost_loc"), 30);
   if (!locOf(lost_loc)) return { error: "Pick where you think you lost it." };
   const email = clip(fd.get("email"), 120).toLowerCase();
@@ -125,7 +127,7 @@ export async function claimItem(fd: FormData): Promise<Result> {
   if (!item || item.status !== "open") return { error: "This item is no longer open." };
   const name = clip(fd.get("name"), 60);
   const email = clip(fd.get("email"), 120).toLowerCase();
-  if (!name) return { error: "Add your name." };
+  if (!meaningful(name)) return { error: "Add your name." };
   if (!validEmail(email)) return { error: "Add an email the finder can reply to." };
   const c = { id: rid(10), item_id: item.id, name, email, proof: clip(fd.get("proof"), 300), created_at: Date.now() };
   await q("insert into claims (id, item_id, name, email, proof, created_at) values ($1,$2,$3,$4,$5,$6)", [c.id, c.item_id, c.name, c.email, c.proof, c.created_at]);
