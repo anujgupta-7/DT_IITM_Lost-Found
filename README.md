@@ -24,7 +24,7 @@ Next.js on Vercel, Neon Postgres, Vercel Blob for photos, Gmail for email.
 | Name | What it is |
 |---|---|
 | `DATABASE_URL` | Added by the Neon integration |
-| `BLOB_READ_WRITE_TOKEN` | Added by the Blob integration |
+| `BLOB_STORE_ID` | Added by the Blob integration |
 | `ADMIN_KEY` | A passphrase you choose. Opens `/admin` |
 | `GMAIL_USER` | The project Gmail address |
 | `GMAIL_APP_PASSWORD` | A Gmail app password for that account |

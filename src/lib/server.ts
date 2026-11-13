@@ -37,7 +37,7 @@ export async function currentHub(): Promise<Hub | null> {
 
 export async function storePhoto(file: File | null, id: string): Promise<string | null> {
   if (!file || file.size === 0 || file.size > 4_000_000 || !file.type.startsWith("image/")) return null;
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  if (process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID) {
     try {
       const { put } = await import("@vercel/blob");
       const r = await put(`items/${id}.jpg`, file, { access: "public", addRandomSuffix: true, contentType: file.type });

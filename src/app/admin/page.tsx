@@ -64,7 +64,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ w
       <h1 className="text-3xl font-extrabold">Admin</h1>
       <div className="mt-3 flex flex-wrap gap-2">
         {pill(!!(process.env.DATABASE_URL || process.env.POSTGRES_URL), "Database connected", "Database: local test mode")}
-        {pill(!!process.env.BLOB_READ_WRITE_TOKEN, "Photo storage connected", "Photo storage not connected")}
+        {pill(!!(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID), "Photo storage connected", "Photo storage not connected")}
         {pill(mailConfigured(), `Email on, ${mails[0]?.ok ?? 0} of ${mails[0]?.n ?? 0} sent`, "Email off: add GMAIL_USER and GMAIL_APP_PASSWORD")}
       </div>
 
