@@ -58,7 +58,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         <div className="flex items-start gap-4 p-4 sm:p-5">
           <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-coral-soft"><CatIcon id={l.category} className="h-8 w-8 text-coral" /></span>
           <div>
-            <p className="text-sm font-semibold text-coral">{open ? "Someone is looking for this" : "Closed"}</p>
+            <p className={`text-sm font-semibold ${open ? "text-coral" : "text-leaf"}`}>{!open ? "Closed" : mine ? "Your lost report" : openAnswers.length ? "Found, waiting for the owner" : "Someone is looking for this"}</p>
             <h1 className="break-words text-[24px] font-extrabold leading-tight sm:text-[26px]">{l.title}</h1>
             <p className="mt-1 flex items-start gap-2 text-[15px] text-muted">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0" />

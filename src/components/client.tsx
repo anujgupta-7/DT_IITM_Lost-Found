@@ -74,6 +74,7 @@ export function SavePost({ post }: { post: Omit<Post, "at"> }) {
 
 export function MyPosts() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [status, setStatus] = useState<Record<string, string>>({});
   useEffect(() => {
     const all = readPosts();
     if (!all.length) return;
@@ -81,11 +82,12 @@ export function MyPosts() {
     const l = all.filter((p) => p.t === "lost").map((p) => p.id).join(",");
     fetch(`/api/mine?f=${f}&l=${l}`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((live: { f: string[]; l: string[] } | null) => {
+      .then((live: { f: string[]; l: string[]; s?: Record<string, string> } | null) => {
         if (!live) return;
         const keep = all.filter((p) => (p.t === "found" ? live.f : live.l).includes(p.id));
         try { localStorage.setItem("if_posts", JSON.stringify(keep)); } catch {}
         setPosts(keep);
+        setStatus(live.s ?? {});
       })
       .catch(() => {});
   }, []);
@@ -98,9 +100,13 @@ export function MyPosts() {
           <li key={p.id}>
             <Link href={p.t === "found" ? `/item/${p.id}?k=${p.k}` : `/lost/${p.id}?k=${p.k}`} className="flex min-h-11 items-center justify-between gap-3 py-2 text-[15px]">
               <span className="truncate font-semibold">{p.title}</span>
-              <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold ${p.t === "found" ? "bg-marigold-soft text-banyan-deep" : "bg-coral-soft text-coral"}`}>
-                {p.t === "found" ? "You found" : "You lost"}
-              </span>
+              {(() => {
+                const st = status[p.id];
+                const done = st === "returned" || st === "closed";
+                const label = done ? (p.t === "found" ? "Returned" : "Got it back") : p.t === "found" ? "You found" : "You lost";
+                const tone = done ? "bg-leaf-soft text-leaf" : p.t === "found" ? "bg-marigold-soft text-banyan-deep" : "bg-coral-soft text-coral";
+                return <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold ${tone}`}>{label}</span>;
+              })()}
             </Link>
           </li>
         ))}

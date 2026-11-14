@@ -54,7 +54,7 @@ export async function listLost(f: { q?: string; cat?: string }) {
     if (cats.length) { p.push(cats); ors.push(`category = any($${p.length})`); }
     where.push(ors.length ? `(${ors.join(" or ")})` : "false");
   }
-  return q<Lost>(`select * from lost where ${where.join(" and ")} order by created_at desc limit 120`, p);
+  return q<Lost>(`select lost.*, (select count(*)::int from items i where i.lost_id = lost.id and i.status = 'open') as answered from lost where ${where.join(" and ")} order by created_at desc limit 120`, p);
 }
 
 export const getLost = cache(async (id: string) => {

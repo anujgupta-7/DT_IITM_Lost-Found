@@ -116,11 +116,16 @@ export default async function Page({ params, searchParams }: { params: Promise<{
               <>
                 <p className="display mt-0.5 flex items-start gap-2 text-2xl font-extrabold leading-tight text-banyan-deep"><MapPin className="mt-0.5 h-6 w-6 shrink-0" /> Left where it was found</p>
                 <p className="mt-2 text-[16px]">{locLabel(i.found_loc)}{i.found_detail ? `, ${i.found_detail}` : ""}{i.left_note ? `. ${i.left_note}` : ""}</p>
-                <ActionForm action={markReturned} className="mt-4">
-                  <input type="hidden" name="id" value={i.id} />
-                  <input type="hidden" name="k" value={sp.k ?? ""} />
-                  <button className="btn btn-primary w-full"><Check className="h-5 w-5" /> It&rsquo;s mine and I&rsquo;ve picked it up</button>
-                </ActionForm>
+                <details className="group mt-4">
+                  <summary className="btn btn-primary w-full cursor-pointer list-none"><Check className="h-5 w-5" /> It&rsquo;s mine and I&rsquo;ve picked it up</summary>
+                  <ActionForm action={markReturned} className="mt-3 [&>div]:space-y-2">
+                    <input type="hidden" name="id" value={i.id} />
+                    <input type="hidden" name="k" value={sp.k ?? ""} />
+                    <p className="text-[15px] text-muted">Only do this once it&rsquo;s in your hands. {i.finder_email ? "The person who found it will be told." : ""}</p>
+                    <input name="returned_to" required minLength={2} className="field" placeholder="Your name" maxLength={80} />
+                    <button className="btn btn-primary w-full">Confirm I have it</button>
+                  </ActionForm>
+                </details>
               </>
             )}
             {i.holding === "finder" && (

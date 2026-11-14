@@ -27,7 +27,10 @@ export default async function Page() {
   const all = await listItems({ hub: hub.id });
   const open = all.filter((i) => i.status === "open");
   const done = all.filter((i) => i.status === "returned");
-  const looking = await q<Lost>("select * from lost where status = 'open' and lost_loc = $1 order by created_at desc limit 12", [hub.loc]);
+  const looking = await q<Lost>(
+    "select * from lost where status = 'open' and lost_loc = $1 and not exists (select 1 from items i where i.lost_id = lost.id and i.status = 'open') order by created_at desc limit 12",
+    [hub.loc],
+  );
 
   return (
     <main className="mx-auto max-w-2xl px-4 pb-16 pt-5">

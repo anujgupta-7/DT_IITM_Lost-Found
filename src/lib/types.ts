@@ -16,7 +16,7 @@ export type Item = {
 export type Lost = {
   id: string; category: string; title: string; details: string; lost_loc: string; lost_detail: string;
   lost_on: string; name: string; email: string; manage_token: string; status: "open" | "closed";
-  item_id: string | null; closed_at: number | null; created_at: number;
+  item_id: string | null; closed_at: number | null; created_at: number; answered?: number;
 };
 
 export type Claim = { id: string; item_id: string; name: string; email: string; proof: string; created_at: number };

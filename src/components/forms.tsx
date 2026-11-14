@@ -50,7 +50,7 @@ export function FoundForm({
     fd.set("category", cat);
     if (photo && !isId) { fd.set("photo", photo); if (thumb) fd.set("thumb", thumb); }
     if (deskHub) fd.set("as_hub", "1");
-    else { fd.set("holding", holding); fd.set("hub_id", hubId || nearby[0]?.id || hubs[0]?.id || ""); }
+    else { fd.set("holding", holding); fd.set("hub_id", holding === "hub" ? hubId : ""); }
     setErr("");
     start(async () => {
       const r = await createFound(fd);
@@ -86,7 +86,7 @@ export function FoundForm({
           ) : (
             <Step n={2} title="Show it">
               <PhotoInput onChange={(f, t) => { setPhoto(f); setThumb(t); }} />
-              <input name="title" className="field mt-3" placeholder="Short description, like Black Milton bottle" maxLength={80} />
+              <input name="title" defaultValue={lost?.title ?? ""} className="field mt-3" placeholder="Short description, like Black Milton bottle" maxLength={80} />
               {cat === "wallet" && <p className="mt-2 text-sm text-muted">Photograph only the outside. Keep cards and cash out of the picture.</p>}
             </Step>
           )}
@@ -106,12 +106,13 @@ export function FoundForm({
               <div className="space-y-2" role="radiogroup">
                 {hubs.length > 0 && (
                   <div>
-                    <button type="button" role="radio" aria-checked={holding === "hub"} className={opt("hub")} onClick={() => { setHolding("hub"); if (!hubId) setHubId(nearby[0]?.id ?? hubs[0].id); }}>
+                    <button type="button" role="radio" aria-checked={holding === "hub"} className={opt("hub")} onClick={() => { setHolding("hub"); if (!hubId && nearby[0]) setHubId(nearby[0].id); }}>
                       <Building2 className="mt-0.5 h-5 w-5 shrink-0 text-banyan" />
                       <span><b className="block">I handed it to a desk</b><span className="text-sm text-muted">{nearby[0] ? `Nearest: ${nearby[0].name}${nearby[0].place ? `, ${nearby[0].place}` : ""}` : "Security or an office that keeps found items"}</span></span>
                     </button>
                     {holding === "hub" && (
                       <select value={hubId} onChange={(e) => setHubId(e.target.value)} className="field mt-2" aria-label="Which desk">
+                        {!nearby[0] && <option value="" disabled>Choose the desk you gave it to</option>}
                         {hubs.map((h) => <option key={h.id} value={h.id}>{h.name} ({locLabel(h.loc)})</option>)}
                       </select>
                     )}

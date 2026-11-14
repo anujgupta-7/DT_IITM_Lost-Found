@@ -74,9 +74,15 @@ export function LostCard({ l }: { l: Lost }) {
           </p>
         </div>
       </div>
-      <div className="tag-stub bg-coral-soft">
-        <p className="text-sm font-bold text-coral">Seen it? Tell the owner</p>
-      </div>
+      {l.answered ? (
+        <div className="tag-stub bg-leaf-soft">
+          <p className="flex items-center gap-1.5 text-sm font-bold text-leaf"><Check className="h-4 w-4" /> Found, waiting for the owner</p>
+        </div>
+      ) : (
+        <div className="tag-stub bg-coral-soft">
+          <p className="text-sm font-bold text-coral">Seen it? Tell the owner</p>
+        </div>
+      )}
     </Link>
   );
 }
