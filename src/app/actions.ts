@@ -178,7 +178,7 @@ export async function closeLost(fd: FormData): Promise<{ url: string } | void> {
   const tell = back.filter((i) => i.finder_email);
   if (tell.length) after(async () => { for (const i of tell) await mailFinderReturned(i); });
   revalidatePath("/", "layout");
-  return { url: `/lost/${l.id}?k=${k}&done=1` };
+  return { url: k ? `/lost/${l.id}?k=${k}&done=1` : `/lost/${l.id}` };
 }
 
 export async function sendFeedback(fd: FormData): Promise<{ ok: boolean }> {

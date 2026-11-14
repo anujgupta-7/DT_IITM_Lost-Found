@@ -22,7 +22,8 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const l = await getLost(id);
   if (!l) notFound();
-  const mine = (!!sp.k && sp.k === l.manage_token) || (await isAdmin());
+  const mine = !!sp.k && sp.k === l.manage_token;
+  const admin = !mine && (await isAdmin());
   const open = l.status === "open";
   const [answers0, linked] = await Promise.all([linkedItems(l), l.item_id ? getItem(l.item_id) : null]);
   const answers = linked && !answers0.some((i) => i.id === linked.id) ? [...answers0, linked] : answers0;
@@ -141,6 +142,13 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           </ActionForm>
         </section>
       ))}
+      {admin && open && (
+        <ActionForm action={closeLost} className="mt-4 rounded-2xl border-2 border-dashed border-line p-4">
+          <input type="hidden" name="id" value={l.id} /><input type="hidden" name="k" value="" /><input type="hidden" name="only" value="1" />
+          <p className="text-[15px] text-muted">Admin: close this report without touching any found posts.</p>
+          <button className="btn btn-ghost mt-2">Close report</button>
+        </ActionForm>
+      )}
       <section className="mt-6 rounded-2xl bg-paper p-4"><FeedbackForm ctx="lost" compact /></section>
     </main>
   );
