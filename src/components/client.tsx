@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Check, Copy, Loader2, Search, ThumbsDown, ThumbsUp, X } from "lucide-react";
-import { claimItem, sendFeedback } from "@/app/actions";
+import { Check, Copy, Loader2, Search, X } from "lucide-react";
+import { claimItem } from "@/app/actions";
 
 export function SearchBar({ placeholder }: { placeholder: string }) {
   const router = useRouter();
@@ -91,42 +91,6 @@ export function MyPosts() {
           </li>
         ))}
       </ul>
-    </section>
-  );
-}
-
-export function Feedback({ ctx }: { ctx: string }) {
-  const [state, setState] = useState<"ask" | "note" | "done">("ask");
-  const [helped, setHelped] = useState(true);
-  const [note, setNote] = useState("");
-  const [pending, start] = useTransition();
-
-  function send(h: boolean, n: string) {
-    const fd = new FormData();
-    fd.set("helped", h ? "yes" : "no");
-    fd.set("note", n);
-    fd.set("ctx", ctx);
-    start(async () => { await sendFeedback(fd); });
-  }
-
-  if (state === "done") return <p className="rounded-2xl bg-paper p-4 text-center text-[15px] font-semibold text-leaf">Thanks. That helps us make this better.</p>;
-  return (
-    <section className="rounded-2xl bg-paper p-4">
-      {state === "ask" ? (
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="font-bold">Is InstiFound making this easier?</p>
-          <div className="flex gap-2">
-            <button type="button" className="btn btn-ghost min-h-11 !px-4 !py-2" onClick={() => { setHelped(true); setState("note"); }}><ThumbsUp className="h-4 w-4" /> Yes</button>
-            <button type="button" className="btn btn-ghost min-h-11 !px-4 !py-2" onClick={() => { setHelped(false); setState("note"); }}><ThumbsDown className="h-4 w-4" /> No</button>
-          </div>
-        </div>
-      ) : (
-        <div>
-          <p className="font-bold">{helped ? "Good to hear. What worked?" : "What got in the way?"}</p>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} className="field mt-2" placeholder="One line is plenty (optional)" maxLength={400} />
-          <button type="button" disabled={pending} className="btn btn-primary mt-2 !py-2.5" onClick={() => { send(helped, note); setState("done"); }}>Send feedback</button>
-        </div>
-      )}
     </section>
   );
 }

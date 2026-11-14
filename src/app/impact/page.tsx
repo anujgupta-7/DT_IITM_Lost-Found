@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Impact so far" };
 
 function fmtHours(h: number | null) {
-  if (h === null) return "No returns yet";
+  if (h === null) return "None yet";
   if (h < 1) return Math.max(1, Math.round(h * 60)) + " min";
   if (h < 48) return Math.round(h) + " hours";
   return Math.round(h / 24) + " days";
@@ -15,13 +15,14 @@ export default async function Page() {
   const s = await stats();
   const rate = s.logged ? Math.round((s.returned / s.logged) * 100) : 0;
   const rows: [string, string, string][] = [
+    ["People who have used InstiFound", String(s.visitors), "Different phones and computers that opened it"],
     ["Found items posted", String(s.logged), `${s.open} waiting to be collected`],
     ["Returned to owners", String(s.returned), s.logged ? `${rate}% of everything posted` : "Nothing posted yet"],
     ["Typical time to return", fmtHours(s.median), "Median, from posting to handover"],
     ["Lost reports", String(s.lost.total), `${s.lost.closed} closed as recovered`],
     ["Desks listing items", String(s.hubs), "Offices and security desks in the pilot"],
     ["Times an item page was opened", String(s.views), "People checking where something is"],
-    ["Feedback", s.feedback.total ? `${s.feedback.yes} of ${s.feedback.total}` : "None yet", "said InstiFound made it easier"],
+    ["Ease of use", s.feedback.avg ? `${s.feedback.avg.toFixed(1)} of 5` : "No ratings yet", s.feedback.rated ? `Average from ${s.feedback.rated} rating${s.feedback.rated === 1 ? "" : "s"}` : "Tap Feedback at the top to rate it"],
   ];
   const max = Math.max(1, ...s.byCat.map((c) => c.n));
   return (

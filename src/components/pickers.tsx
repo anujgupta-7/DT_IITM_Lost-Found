@@ -106,31 +106,31 @@ export function LocationPicker({
   );
 }
 
-async function shrink(file: File): Promise<File> {
+async function shrink(file: File, max = 1400, quality = 0.8): Promise<File> {
   try {
     const bmp = await createImageBitmap(file, { imageOrientation: "from-image" } as ImageBitmapOptions);
-    const scale = Math.min(1, 1400 / Math.max(bmp.width, bmp.height));
+    const scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
     const c = document.createElement("canvas");
     c.width = Math.round(bmp.width * scale);
     c.height = Math.round(bmp.height * scale);
     c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
-    const blob: Blob | null = await new Promise((r) => c.toBlob(r, "image/jpeg", 0.8));
+    const blob: Blob | null = await new Promise((r) => c.toBlob(r, "image/jpeg", quality));
     return blob ? new File([blob], "photo.jpg", { type: "image/jpeg" }) : file;
   } catch {
     return file;
   }
 }
 
-export function PhotoInput({ onChange }: { onChange: (f: File | null) => void }) {
+export function PhotoInput({ onChange }: { onChange: (f: File | null, thumb: File | null) => void }) {
   const [url, setUrl] = useState<string | null>(null);
   const ref = useRef<HTMLInputElement>(null);
   async function pick(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
-    const small = await shrink(f);
+    const [small, thumb] = await Promise.all([shrink(f), shrink(f, 520, 0.72)]);
     if (url) URL.revokeObjectURL(url);
     setUrl(URL.createObjectURL(small));
-    onChange(small);
+    onChange(small, thumb);
   }
   return (
     <div>

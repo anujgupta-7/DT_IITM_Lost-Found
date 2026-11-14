@@ -6,7 +6,7 @@ export type Hub = {
 export type Item = {
   id: string; category: string; title: string; details: string; found_loc: string; found_detail: string;
   found_on: string; holding: "hub" | "left" | "finder"; hub_id: string | null; left_note: string;
-  photo_url: string | null; roll: string | null; hidden_detail: string; finder_name: string;
+  photo_url: string | null; thumb_url?: string | null; roll: string | null; hidden_detail: string; finder_name: string;
   finder_email: string; manage_token: string; status: "open" | "returned" | "hidden";
   returned_at: number | null; returned_to: string; thanks: string; lost_id: string | null;
   views: number; created_at: number;

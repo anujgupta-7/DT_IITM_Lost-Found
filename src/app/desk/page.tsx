@@ -44,7 +44,7 @@ export default async function Page() {
               <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-mist">
                 {i.photo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={i.photo_url} alt="" className="h-full w-full object-cover" />
+                  <img src={i.thumb_url || i.photo_url} alt="" loading="lazy" className="h-full w-full object-cover" />
                 ) : <CatIcon id={i.category} className="h-7 w-7 text-banyan/60" />}
               </span>
               <span className="min-w-0 flex-1">

@@ -34,6 +34,7 @@ export function FoundForm({
 }) {
   const [cat, setCat] = useState(lost?.category ?? "");
   const [photo, setPhoto] = useState<File | null>(null);
+  const [thumb, setThumb] = useState<File | null>(null);
   const [loc, setLoc] = useState(deskHub ? deskHub.loc : initLoc);
   const nearby = hubs.filter((h) => h.loc === loc);
   const [holding, setHolding] = useState<string>("");
@@ -47,7 +48,7 @@ export function FoundForm({
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     fd.set("category", cat);
-    if (photo && !isId) fd.set("photo", photo);
+    if (photo && !isId) { fd.set("photo", photo); if (thumb) fd.set("thumb", thumb); }
     if (deskHub) fd.set("as_hub", "1");
     else { fd.set("holding", holding); fd.set("hub_id", hubId || nearby[0]?.id || hubs[0]?.id || ""); }
     setErr("");
@@ -84,7 +85,7 @@ export function FoundForm({
             </Step>
           ) : (
             <Step n={2} title="Show it">
-              <PhotoInput onChange={setPhoto} />
+              <PhotoInput onChange={(f, t) => { setPhoto(f); setThumb(t); }} />
               <input name="title" className="field mt-3" placeholder="Short description, like Black Milton bottle" maxLength={80} />
               {cat === "wallet" && <p className="mt-2 text-sm text-muted">Photograph only the outside. Keep cards and cash out of the picture.</p>}
             </Step>

@@ -92,6 +92,16 @@ html { scroll-padding-bottom: 96px; }
 button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 input[type="date"] { min-height: 50px; -webkit-appearance: none; appearance: none; }
 
+.nav-progress {
+  position: fixed; top: 0; left: 0; z-index: 100; height: 3px; width: 100%; background: var(--color-marigold);
+  transform-origin: left; animation: navp 2.2s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+}
+@keyframes navp { from { transform: scaleX(0.05); } to { transform: scaleX(0.92); } }
+
+.skel { border-radius: 14px; background: linear-gradient(90deg, #e3ebe6 0%, #eef3f0 45%, #e3ebe6 90%); background-size: 200% 100%; animation: skel 1.1s linear infinite; }
+@keyframes skel { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@media (prefers-reduced-motion: reduce) { .skel, .nav-progress { animation: none; } }
+
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 

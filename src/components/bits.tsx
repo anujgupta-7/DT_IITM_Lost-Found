@@ -33,7 +33,7 @@ export function ItemCard({ i }: { i: Item }) {
       <div className={`relative aspect-[4/3] ${i.photo_url ? "bg-mist" : "bg-banyan/[0.06]"} flex items-center justify-center`}>
         {i.photo_url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={i.photo_url} alt="" loading="lazy" className={`h-full w-full object-cover ${returned ? "opacity-60 grayscale" : ""}`} />
+          <img src={i.thumb_url || i.photo_url} alt="" loading="lazy" decoding="async" className={`h-full w-full object-cover ${returned ? "opacity-60 grayscale" : ""}`} />
         ) : (
           <CatIcon id={i.category} className="h-12 w-12 text-banyan/50" />
         )}

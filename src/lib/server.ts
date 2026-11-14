@@ -1,5 +1,6 @@
 import "server-only";
 import { randomBytes, createHash } from "crypto";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { q } from "./db";
 import type { Hub } from "./types";
@@ -28,32 +29,33 @@ export async function isAdmin() {
   return !!c && adminKey() !== "" && c === adminHash(adminKey());
 }
 
-export async function currentHub(): Promise<Hub | null> {
+export const currentHub = cache(async (): Promise<Hub | null> => {
   const t = (await cookies()).get("if_hub")?.value;
   if (!t) return null;
   const rows = await q<Hub>("select * from hubs where token = $1 and active", [t]);
   return rows[0] ?? null;
+});
+
+async function putBlob(path: string, file: File): Promise<string | null> {
+  const { put } = await import("@vercel/blob");
+  try {
+    const r = await put(path, file, { access: "private", addRandomSuffix: true, contentType: file.type });
+    return `/photo/${r.pathname}`;
+  } catch (e) {
+    if (!String(e).includes("private access on a public store")) { console.error("photo upload failed", e); return null; }
+  }
+  try {
+    const r = await put(path, file, { access: "public", addRandomSuffix: true, contentType: file.type });
+    return r.url;
+  } catch (e) {
+    console.error("photo upload failed", e);
+    return null;
+  }
 }
 
-export async function storePhoto(file: File | null, id: string): Promise<string | null> {
+export async function storePhoto(file: File | null, id: string, suffix = ""): Promise<string | null> {
   if (!file || file.size === 0 || file.size > 4_000_000 || !file.type.startsWith("image/")) return null;
-  if (process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID) {
-    const { put } = await import("@vercel/blob");
-    const path = `items/${id}.jpg`;
-    try {
-      const r = await put(path, file, { access: "private", addRandomSuffix: true, contentType: file.type });
-      return `/photo/${r.pathname}`;
-    } catch (e) {
-      if (!String(e).includes("private access on a public store")) { console.error("photo upload failed", e); return null; }
-    }
-    try {
-      const r = await put(path, file, { access: "public", addRandomSuffix: true, contentType: file.type });
-      return r.url;
-    } catch (e) {
-      console.error("photo upload failed", e);
-      return null;
-    }
-  }
+  if (process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID) return putBlob(`items/${id}${suffix}.jpg`, file);
   if (process.env.NODE_ENV !== "production") {
     const buf = Buffer.from(await file.arrayBuffer());
     return `data:${file.type};base64,${buf.toString("base64")}`;

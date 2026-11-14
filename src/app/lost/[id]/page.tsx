@@ -7,7 +7,8 @@ import { isAdmin, siteUrl } from "@/lib/server";
 import { mailConfigured } from "@/lib/mail";
 import { ago, fmtDay } from "@/lib/util";
 import { CatIcon, ItemCard } from "@/components/bits";
-import { CopyButton, Feedback, SavePost } from "@/components/client";
+import { CopyButton, SavePost } from "@/components/client";
+import { ActionForm, FeedbackForm } from "@/components/chrome";
 import { closeLost } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
@@ -92,14 +93,14 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             <a href={wa} target="_blank" rel="noopener" className="btn btn-wa flex-1 whitespace-nowrap"><MessageCircle className="h-5 w-5" /> Share on WhatsApp</a>
             <CopyButton text={url} label="Copy" />
           </div>
-          <form action={closeLost} className="mt-3">
+          <ActionForm action={closeLost} className="mt-3">
             <input type="hidden" name="id" value={l.id} /><input type="hidden" name="k" value={sp.k ?? ""} />
             <button className="btn btn-ghost w-full"><Check className="h-5 w-5" /> I got it back, close this report</button>
-          </form>
+          </ActionForm>
         </>
       )}
 
-      <div className="mt-6"><Feedback ctx={`lost:${l.id}`} /></div>
+      <section className="mt-6 rounded-2xl bg-paper p-4"><FeedbackForm ctx="lost" compact /></section>
     </main>
   );
 }

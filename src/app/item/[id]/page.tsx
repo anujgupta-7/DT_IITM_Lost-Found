@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import { ArrowLeft, Building2, Check, Clock, Hand, IdCard, MapPin, MessageCircle, PartyPopper, ShieldCheck, UserRound } from "lucide-react";
 import { q } from "@/lib/db";
 import { catLabel, locLabel } from "@/lib/data";
@@ -8,7 +9,8 @@ import { currentHub, isAdmin, siteUrl } from "@/lib/server";
 import { mailConfigured } from "@/lib/mail";
 import { ago, fmtDate, fmtDay } from "@/lib/util";
 import { CatIcon, itemTitle } from "@/components/bits";
-import { ClaimForm, CopyButton, Feedback, SavePost } from "@/components/client";
+import { ClaimForm, CopyButton, SavePost } from "@/components/client";
+import { ActionForm, FeedbackForm } from "@/components/chrome";
 import { markReturned, reopenItem, sendThanks } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
@@ -25,14 +27,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<SP> }) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
-  const i = await getItem(id);
+  const [i, admin, desk] = await Promise.all([getItem(id), isAdmin(), currentHub()]);
   if (!i) notFound();
-  const [admin, desk] = await Promise.all([isAdmin(), currentHub()]);
   const owner = !!sp.k && sp.k === i.manage_token;
   const atDesk = !!desk && desk.id === i.hub_id;
   const manager = owner || admin || atDesk;
   if (i.status === "hidden" && !manager) notFound();
-  if (!manager) await q("update items set views = views + 1 where id = $1", [i.id]);
+  if (!manager) after(() => q("update items set views = views + 1 where id = $1", [i.id]).then(() => {}));
   const claims = manager ? await listClaims(i.id) : [];
 
   const title = itemTitle(i);
@@ -116,11 +117,11 @@ export default async function Page({ params, searchParams }: { params: Promise<{
               <>
                 <p className="display mt-0.5 flex items-start gap-2 text-2xl font-extrabold leading-tight text-banyan-deep"><MapPin className="mt-0.5 h-6 w-6 shrink-0" /> Left where it was found</p>
                 <p className="mt-2 text-[16px]">{locLabel(i.found_loc)}{i.found_detail ? `, ${i.found_detail}` : ""}{i.left_note ? `. ${i.left_note}` : ""}</p>
-                <form action={markReturned} className="mt-4">
+                <ActionForm action={markReturned} className="mt-4">
                   <input type="hidden" name="id" value={i.id} />
                   <input type="hidden" name="k" value={sp.k ?? ""} />
                   <button className="btn btn-primary w-full"><Check className="h-5 w-5" /> It&rsquo;s mine and I&rsquo;ve picked it up</button>
-                </form>
+                </ActionForm>
               </>
             )}
             {i.holding === "finder" && (
@@ -160,17 +161,17 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             </div>
           )}
           {returned ? (
-            <form action={reopenItem} className="mt-3">
+            <ActionForm action={reopenItem} className="mt-3">
               <input type="hidden" name="id" value={i.id} /><input type="hidden" name="k" value={sp.k ?? ""} />
               <p className="text-[15px] text-muted">{i.returned_to ? `Collected by ${i.returned_to}. ` : ""}Marked by mistake?</p>
               <button className="btn btn-ghost mt-2">Reopen this item</button>
-            </form>
+            </ActionForm>
           ) : (
-            <form action={markReturned} className="mt-3 space-y-2">
+            <ActionForm action={markReturned} className="mt-3 [&>div]:space-y-2">
               <input type="hidden" name="id" value={i.id} /><input type="hidden" name="k" value={sp.k ?? ""} />
               <input name="returned_to" className="field" placeholder="Collected by (optional)" maxLength={80} />
               <button className="btn btn-primary w-full"><Check className="h-5 w-5" /> Mark as returned</button>
-            </form>
+            </ActionForm>
           )}
         </section>
       )}
@@ -178,11 +179,11 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       {returned && !i.thanks && i.finder_email && !manager && (
         <section className="mt-4 rounded-2xl bg-paper p-4 sm:p-5">
           <h2 className="text-lg font-bold">Was this yours? Thank the finder</h2>
-          <form action={sendThanks} className="mt-2 space-y-2">
+          <ActionForm action={sendThanks} className="mt-2 [&>div]:space-y-2">
             <input type="hidden" name="id" value={i.id} />
             <textarea name="note" required rows={2} maxLength={300} className="field" placeholder="A line of thanks goes a long way" />
             <button className="btn btn-primary">Send thanks</button>
-          </form>
+          </ActionForm>
         </section>
       )}
 
@@ -193,7 +194,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         </div>
       )}
 
-      <div className="mt-6"><Feedback ctx={`item:${i.id}`} /></div>
+      <section className="mt-6 rounded-2xl bg-paper p-4"><FeedbackForm ctx="item" compact /></section>
       <p className="mt-4 text-center text-[15px] leading-relaxed text-muted">
         Not yours? <Link href="/" className="underline">See everything found</Link> or <Link href={`/lost/new?cat=${i.category}`} className="underline">post a lost report</Link>.
       </p>
