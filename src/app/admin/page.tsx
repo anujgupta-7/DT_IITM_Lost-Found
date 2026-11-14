@@ -73,7 +73,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ w
   const tiles: [string, string, string][] = [
     ["Visitors", String(vs.visitors), `${vs.today} today, ${vs.week} in the last 7 days`],
     ["Visits", String(vs.sessions), `${vs.returning} people came back more than once`],
-    ["Time per visit", dur(vs.avg_ms), `Average. Half of visits last under ${dur(vs.med_ms).toLowerCase()}`],
+    ["Time per visit", dur(vs.avg_ms), vs.med_ms && vs.med_ms >= 1000 ? `Average. Half of visits last under ${dur(vs.med_ms)}` : "Average. Most visits so far were very short"],
     ["Pages per visit", vs.sessions ? (vs.pageviews / vs.sessions).toFixed(1) : "0", `${vs.pageviews} page views in total`],
   ];
   const base = siteUrl();
