@@ -108,8 +108,19 @@ export async function markReturned(fd: FormData): Promise<{ url: string } | void
   const k = clip(fd.get("k"), 40);
   if (!item || item.status !== "open") return;
   if (!(item.holding === "left" || (await canManage(item, k)))) return;
-  await q("update items set status = 'returned', returned_at = $2, returned_to = $3 where id = $1", [item.id, Date.now(), clip(fd.get("returned_to"), 80)]);
-  if (item.lost_id) await q("update lost set status = 'closed', closed_at = $2, item_id = $3 where id = $1 and status = 'open'", [item.lost_id, Date.now(), item.id]);
+  const now = Date.now();
+  const to = clip(fd.get("returned_to"), 80);
+  await q("update items set status = 'returned', returned_at = $2, returned_to = $3 where id = $1", [item.id, now, to]);
+  if (item.lost_id) await q("update lost set status = 'closed', closed_at = $2, item_id = $3 where id = $1 and status = 'open'", [item.lost_id, now, item.id]);
+  const claims = await q<{ name: string; email: string }>("select name, email from claims where item_id = $1", [item.id]);
+  const t = to.toLowerCase();
+  const who = claims.find((c) => t && (c.name.toLowerCase() === t || c.email === t)) ?? (claims.length === 1 ? claims[0] : null);
+  if (who) {
+    await q(
+      "update lost set status = 'closed', closed_at = $2, item_id = $3 where status = 'open' and lower(email) = $1 and category = $4",
+      [who.email, now, item.id, item.category],
+    );
+  }
   if (item.finder_email) after(() => mailFinderReturned(item));
   revalidatePath("/", "layout");
   return { url: `/item/${item.id}?${k ? `k=${k}&` : ""}done=1` };
@@ -120,6 +131,7 @@ export async function reopenItem(fd: FormData): Promise<{ url: string } | void> 
   const k = clip(fd.get("k"), 40);
   if (!item || item.status !== "returned" || !(await canManage(item, k))) return;
   await q("update items set status = 'open', returned_at = null, returned_to = '' where id = $1", [item.id]);
+  await q("update lost set status = 'open', closed_at = null, item_id = null where item_id = $1 and status = 'closed'", [item.id]);
   revalidatePath("/", "layout");
   return { url: `/item/${item.id}${k ? `?k=${k}` : ""}` };
 }
@@ -141,12 +153,15 @@ export async function claimItem(fd: FormData): Promise<Result> {
 
 export async function sendThanks(fd: FormData): Promise<{ url: string } | void> {
   const item = await getItem(clip(fd.get("id"), 20));
+  const l = await getLost(clip(fd.get("lost"), 20));
+  const k = clip(fd.get("k"), 40);
   const note = clip(fd.get("note"), 300);
-  if (!item || item.status !== "returned" || item.thanks || !note) return;
+  if (!item || !l || k !== l.manage_token || item.status !== "returned" || item.thanks || !note) return;
+  if (!(await linkedItems(l)).some((i) => i.id === item.id) && l.item_id !== item.id) return;
   await q("update items set thanks = $2 where id = $1", [item.id, note]);
   if (item.finder_email) after(() => mailThanks(item, note));
   revalidatePath("/", "layout");
-  return { url: `/item/${item.id}?thanked=1` };
+  return { url: `/lost/${l.id}?k=${k}&thanked=1` };
 }
 
 export async function closeLost(fd: FormData): Promise<{ url: string } | void> {
@@ -155,7 +170,7 @@ export async function closeLost(fd: FormData): Promise<{ url: string } | void> {
   if (!l || l.status !== "open") return;
   if (k !== l.manage_token && !(await isAdmin())) return;
   const now = Date.now();
-  const back = (await linkedItems(l)).filter((i) => i.status === "open");
+  const back = fd.get("only") === "1" ? [] : (await linkedItems(l)).filter((i) => i.status === "open");
   for (const i of back) {
     await q("update items set status = 'returned', returned_at = $2, returned_to = $3 where id = $1 and status = 'open'", [i.id, now, l.name || "The owner"]);
   }

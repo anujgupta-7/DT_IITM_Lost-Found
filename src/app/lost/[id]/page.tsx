@@ -9,7 +9,7 @@ import { ago, fmtDay } from "@/lib/util";
 import { CatIcon, ItemCard } from "@/components/bits";
 import { CopyButton, SavePost } from "@/components/client";
 import { ActionForm, FeedbackForm } from "@/components/chrome";
-import { closeLost } from "@/app/actions";
+import { closeLost, sendThanks } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -18,13 +18,14 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return { title: l ? `Lost: ${l.title}` : "Lost report" };
 }
 
-export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ k?: string; new?: string; done?: string }> }) {
+export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ k?: string; new?: string; done?: string; thanked?: string }> }) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const l = await getLost(id);
   if (!l) notFound();
   const mine = (!!sp.k && sp.k === l.manage_token) || (await isAdmin());
   const open = l.status === "open";
-  const [answers, linked] = await Promise.all([linkedItems(l), l.item_id ? getItem(l.item_id) : null]);
+  const [answers0, linked] = await Promise.all([linkedItems(l), l.item_id ? getItem(l.item_id) : null]);
+  const answers = linked && !answers0.some((i) => i.id === linked.id) ? [...answers0, linked] : answers0;
   const openAnswers = answers.filter((i) => i.status === "open");
   const answerIds = new Set(answers.map((i) => i.id));
   const matches = mine && open ? (await itemsMatchingLost(l)).filter((i) => !answerIds.has(i.id)) : [];
@@ -44,6 +45,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           </p>
         </section>
       )}
+      {sp.thanked && <p className="pop-in mt-3 rounded-2xl bg-leaf-soft p-4 font-semibold text-leaf">Your thanks is on its way to the finder.</p>}
       {sp.done && !open && (
         <section className="pop-in mt-3 flex items-center gap-3 rounded-2xl bg-leaf p-5 text-white">
           <PartyPopper className="h-8 w-8 shrink-0" />
@@ -96,6 +98,10 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             <button className="btn btn-primary w-full"><Check className="h-5 w-5" /> I&rsquo;ve collected it, close everything</button>
           </ActionForm>
           <p className="mt-2 text-center text-sm text-muted">This also marks the found post as returned{openAnswers.some((i) => i.finder_email) ? " and tells the finder" : ""}.</p>
+          <ActionForm action={closeLost} className="mt-1 text-center">
+            <input type="hidden" name="id" value={l.id} /><input type="hidden" name="k" value={sp.k ?? ""} /><input type="hidden" name="only" value="1" />
+            <button className="min-h-11 text-[15px] font-semibold text-muted underline">Not mine. I got it back another way</button>
+          </ActionForm>
         </section>
       )}
 
@@ -124,6 +130,17 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         </>
       )}
 
+      {mine && !open && answers.filter((i) => i.status === "returned" && i.finder_email && !i.thanks).slice(0, 1).map((i) => (
+        <section key={i.id} className="mt-4 rounded-2xl bg-paper p-4 sm:p-5">
+          <h2 className="text-lg font-bold">Thank the person who found it</h2>
+          <p className="mt-0.5 text-[15px] text-muted">They&rsquo;ll get your note by email. Your email stays private.</p>
+          <ActionForm action={sendThanks} className="mt-2 [&>div]:space-y-2">
+            <input type="hidden" name="id" value={i.id} /><input type="hidden" name="lost" value={l.id} /><input type="hidden" name="k" value={sp.k ?? ""} />
+            <textarea name="note" required rows={2} maxLength={300} className="field" placeholder="A line of thanks goes a long way" />
+            <button className="btn btn-primary">Send thanks</button>
+          </ActionForm>
+        </section>
+      ))}
       <section className="mt-6 rounded-2xl bg-paper p-4"><FeedbackForm ctx="lost" compact /></section>
     </main>
   );

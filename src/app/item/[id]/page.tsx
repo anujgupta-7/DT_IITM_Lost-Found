@@ -11,7 +11,7 @@ import { ago, fmtDate, fmtDay } from "@/lib/util";
 import { CatIcon, itemTitle } from "@/components/bits";
 import { ClaimForm, CopyButton, SavePost } from "@/components/client";
 import { ActionForm, FeedbackForm } from "@/components/chrome";
-import { markReturned, reopenItem, sendThanks } from "@/app/actions";
+import { markReturned, reopenItem } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -69,7 +69,6 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         </section>
       )}
       {sp.claimed && <p className="pop-in mt-3 rounded-2xl bg-leaf-soft p-4 font-semibold text-leaf">Sent. The finder has your message and will reply to your email.</p>}
-      {sp.thanked && <p className="pop-in mt-3 rounded-2xl bg-leaf-soft p-4 font-semibold text-leaf">Your thanks is on its way to the finder.</p>}
 
       <article className="tag mt-3">
         <div className={`relative flex items-center justify-center ${i.photo_url ? "bg-ink" : "aspect-[3/1] bg-banyan/[0.06] sm:aspect-[16/9]"}`}>
@@ -176,16 +175,6 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         </section>
       )}
 
-      {returned && !i.thanks && i.finder_email && !manager && (
-        <section className="mt-4 rounded-2xl bg-paper p-4 sm:p-5">
-          <h2 className="text-lg font-bold">Was this yours? Thank the finder</h2>
-          <ActionForm action={sendThanks} className="mt-2 [&>div]:space-y-2">
-            <input type="hidden" name="id" value={i.id} />
-            <textarea name="note" required rows={2} maxLength={300} className="field" placeholder="A line of thanks goes a long way" />
-            <button className="btn btn-primary">Send thanks</button>
-          </ActionForm>
-        </section>
-      )}
 
       {!returned && (
         <div className="mt-4 flex flex-wrap gap-2">
