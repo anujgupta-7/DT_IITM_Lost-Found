@@ -8,7 +8,7 @@ import { q } from "@/lib/db";
 import { CATEGORIES, locOf } from "@/lib/data";
 import { clip, normRoll, todayIST, validEmail } from "@/lib/util";
 import { adminHash, adminKeyOk, currentHub, isAdmin, rid, storePhoto } from "@/lib/server";
-import { getHub, getItem, getLost, lostMatchingItem } from "@/lib/repo";
+import { getHub, getItem, getLost, linkedItems, lostMatchingItem } from "@/lib/repo";
 import { mailFinderClaim, mailFinderPosted, mailFinderReturned, mailIdOwner, mailLostConfirm, mailLostMatch, mailThanks } from "@/lib/mail";
 import type { Item } from "@/lib/types";
 
@@ -154,7 +154,14 @@ export async function closeLost(fd: FormData): Promise<{ url: string } | void> {
   const k = clip(fd.get("k"), 40);
   if (!l || l.status !== "open") return;
   if (k !== l.manage_token && !(await isAdmin())) return;
-  await q("update lost set status = 'closed', closed_at = $2 where id = $1", [l.id, Date.now()]);
+  const now = Date.now();
+  const back = (await linkedItems(l)).filter((i) => i.status === "open");
+  for (const i of back) {
+    await q("update items set status = 'returned', returned_at = $2, returned_to = $3 where id = $1 and status = 'open'", [i.id, now, l.name || "The owner"]);
+  }
+  await q("update lost set status = 'closed', closed_at = $2, item_id = coalesce(item_id, $3) where id = $1", [l.id, now, back[0]?.id ?? null]);
+  const tell = back.filter((i) => i.finder_email);
+  if (tell.length) after(async () => { for (const i of tell) await mailFinderReturned(i); });
   revalidatePath("/", "layout");
   return { url: `/lost/${l.id}?k=${k}&done=1` };
 }

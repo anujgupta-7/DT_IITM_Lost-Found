@@ -72,6 +72,14 @@ export async function getHub(id: string | null) {
 export const listClaims = (itemId: string) =>
   q<Claim>("select * from claims where item_id = $1 order by created_at desc", [itemId]);
 
+export async function linkedItems(l: Lost) {
+  return q<Item>(
+    `${ITEM_SEL} where i.status <> 'hidden' and (i.lost_id = $1 or ($2 <> '' and i.id in (select item_id from claims where lower(email) = lower($2))))
+     order by (i.status = 'open') desc, i.created_at desc limit 6`,
+    [l.id, l.email],
+  );
+}
+
 export async function itemsMatchingLost(l: Lost) {
   const rows = await q<Item>(
     `${ITEM_SEL} where i.status = 'open' and i.category = $1 and i.found_on >= $2 order by i.created_at desc limit 60`,

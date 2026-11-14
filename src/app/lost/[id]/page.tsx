@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Check, MapPin, MessageCircle, PartyPopper } from "lucide-react";
 import { catLabel, locLabel } from "@/lib/data";
-import { getItem, getLost, itemsMatchingLost } from "@/lib/repo";
+import { getItem, getLost, itemsMatchingLost, linkedItems } from "@/lib/repo";
 import { isAdmin, siteUrl } from "@/lib/server";
 import { mailConfigured } from "@/lib/mail";
 import { ago, fmtDay } from "@/lib/util";
@@ -24,8 +24,10 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   if (!l) notFound();
   const mine = (!!sp.k && sp.k === l.manage_token) || (await isAdmin());
   const open = l.status === "open";
-  const matches = mine && open ? await itemsMatchingLost(l) : [];
-  const linked = l.item_id ? await getItem(l.item_id) : null;
+  const [answers, linked] = await Promise.all([linkedItems(l), l.item_id ? getItem(l.item_id) : null]);
+  const openAnswers = answers.filter((i) => i.status === "open");
+  const answerIds = new Set(answers.map((i) => i.id));
+  const matches = mine && open ? (await itemsMatchingLost(l)).filter((i) => !answerIds.has(i.id)) : [];
   const url = `${siteUrl()}/lost/${l.id}`;
   const wa = `https://wa.me/?text=${encodeURIComponent(`Lost near ${locLabel(l.lost_loc)}: ${l.title}.\nIf you've seen or found it, tell me here: ${url}`)}`;
 
@@ -62,7 +64,14 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             {l.details && <p className="mt-3 whitespace-pre-line">{l.details}</p>}
           </div>
         </div>
-        {open && !mine && (
+        {open && !mine && openAnswers.length > 0 && (
+          <div className="tag-stub bg-leaf-soft !p-5">
+            <p className="font-bold">Someone has already posted this as found</p>
+            <p className="mt-1 text-[15px] text-muted">The owner has been told. Thanks for looking out.</p>
+            <Link href={`/item/${openAnswers[0].id}`} className="btn btn-ghost mt-3 w-full">See the found post</Link>
+          </div>
+        )}
+        {open && !mine && openAnswers.length === 0 && (
           <div className="tag-stub bg-coral-soft !p-5">
             <p className="font-bold">Have you found it, or know where it is?</p>
             <p className="mt-1 text-[15px] text-muted">Post it as found. The owner gets an email straight away.</p>
@@ -77,14 +86,27 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         )}
       </article>
 
+      {mine && open && openAnswers.length > 0 && (
+        <section className="pop-in mt-4 rounded-2xl border-2 border-leaf bg-paper p-4 sm:p-5">
+          <p className="display flex items-center gap-2 text-xl font-extrabold text-leaf"><Check className="h-6 w-6" strokeWidth={3} /> Someone found it</p>
+          <p className="mt-1 text-[15px] text-muted">{openAnswers.length === 1 ? "This was posted for your report. Open it to see where to collect it." : "These were posted for your report. Open one to see where to collect it."}</p>
+          <div className="mt-3 grid grid-cols-2 gap-2.5">{openAnswers.map((i) => <ItemCard key={i.id} i={i} />)}</div>
+          <ActionForm action={closeLost} className="mt-4">
+            <input type="hidden" name="id" value={l.id} /><input type="hidden" name="k" value={sp.k ?? ""} />
+            <button className="btn btn-primary w-full"><Check className="h-5 w-5" /> I&rsquo;ve collected it, close everything</button>
+          </ActionForm>
+          <p className="mt-2 text-center text-sm text-muted">This also marks the found post as returned{openAnswers.some((i) => i.finder_email) ? " and tells the finder" : ""}.</p>
+        </section>
+      )}
+
       {mine && open && (
         <>
           <section className="mt-5">
-            <h2 className="text-xl font-bold">{matches.length ? "Could one of these be yours?" : "Nothing matching has been found yet"}</h2>
+            <h2 className="text-xl font-bold">{matches.length ? (openAnswers.length ? "Other items that could be yours" : "Could one of these be yours?") : openAnswers.length ? "No other matches" : "Nothing matching has been found yet"}</h2>
             {matches.length ? (
               <div className="mt-3 grid grid-cols-2 gap-2.5">{matches.map((i) => <ItemCard key={i.id} i={i} />)}</div>
             ) : (
-              <p className="mt-1 text-muted">
+              <p className={`mt-1 text-muted ${openAnswers.length ? "hidden" : ""}`}>
                 That&rsquo;s normal in the first day or two. Meanwhile, <Link href="/desks" className="font-semibold text-banyan underline">check where found things are kept</Link> near where you lost it.
               </p>
             )}
@@ -93,10 +115,12 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             <a href={wa} target="_blank" rel="noopener" className="btn btn-wa flex-1 whitespace-nowrap"><MessageCircle className="h-5 w-5" /> Share on WhatsApp</a>
             <CopyButton text={url} label="Copy" />
           </div>
-          <ActionForm action={closeLost} className="mt-3">
-            <input type="hidden" name="id" value={l.id} /><input type="hidden" name="k" value={sp.k ?? ""} />
-            <button className="btn btn-ghost w-full"><Check className="h-5 w-5" /> I got it back, close this report</button>
-          </ActionForm>
+          {openAnswers.length === 0 && (
+            <ActionForm action={closeLost} className="mt-3">
+              <input type="hidden" name="id" value={l.id} /><input type="hidden" name="k" value={sp.k ?? ""} />
+              <button className="btn btn-ghost w-full"><Check className="h-5 w-5" /> I got it back, close this report</button>
+            </ActionForm>
+          )}
         </>
       )}
 
