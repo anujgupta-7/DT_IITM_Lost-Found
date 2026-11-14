@@ -17,7 +17,7 @@ export default async function Page() {
     <main className="mx-auto max-w-3xl px-4 pb-16 pt-6">
       <h1 className="text-3xl font-extrabold sm:text-4xl">Where found things are kept</h1>
       <p className="mt-2 max-w-xl text-[17px] text-muted">
-        When something is left behind in a building, staff usually put it somewhere safe. These are the desks that keep found items and list them here.
+        Staff at these desks keep things found in their building. Lost something nearby? Check here, then collect it from the desk.
       </p>
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {hubs.map((h) => (
@@ -39,7 +39,7 @@ export default async function Page() {
       </div>
       {hubs.length === 0 && <Empty title="No desks listed yet"><p>Desks are being added as buildings join the pilot.</p></Empty>}
       <p className="mt-8 max-w-xl text-[15px] text-muted">
-        Run a security desk or office that ends up holding found items? Listing them here takes 30 seconds each and stops people asking around.{contact ? <> Write to <a className="font-semibold text-banyan underline" href={`mailto:${contact}`}>{contact}</a> to join.</> : null}
+        Does your office or security desk keep found items?{contact ? <> Email <a className="font-semibold text-banyan underline" href={`mailto:${contact}`}>{contact}</a> and we&rsquo;ll add it to this list.</> : " Tell the InstiFound team and we\u2019ll add it to this list."}
       </p>
     </main>
   );
