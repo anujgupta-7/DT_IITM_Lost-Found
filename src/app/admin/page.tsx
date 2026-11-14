@@ -72,7 +72,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ w
   const avgRating = rated.length ? rated.reduce((a, f) => a + (f.rating ?? 0), 0) / rated.length : null;
   const tiles: [string, string, string][] = [
     ["Visitors", String(vs.visitors), `${vs.today} today, ${vs.week} in the last 7 days`],
-    ["Visits", String(vs.sessions), `${vs.returning} people came back more than once`],
+    ["Visits", String(vs.sessions), `${vs.returning} ${vs.returning === 1 ? "person" : "people"} came back after a break`],
     ["Time per visit", dur(vs.avg_ms), vs.med_ms && vs.med_ms >= 1000 ? `Average. Half of visits last under ${dur(vs.med_ms)}` : "Average. Most visits so far were very short"],
     ["Pages per visit", vs.sessions ? (vs.pageviews / vs.sessions).toFixed(1) : "0", `${vs.pageviews} page views in total`],
   ];
@@ -92,7 +92,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ w
       {sp.reset === "typo" && <p className="mt-4 rounded-xl bg-coral-soft px-4 py-3 font-semibold text-coral">Nothing was deleted. Type CLEAR to confirm.</p>}
 
       <h2 className="mt-8 text-xl font-bold">Who is using it</h2>
-      <p className="text-sm text-muted">Counted per phone or computer. Your own visits while signed in to admin are left out.</p>
+      <p className="text-sm text-muted">
+        A visitor is one browser on one device. A visit ends after 30 minutes with nothing opened, so coming back later counts as a new visit.
+        Bots and link previews are ignored, and so are visits from any browser signed in to admin.
+      </p>
       <dl className="mt-3 grid grid-cols-2 gap-2.5">
         {tiles.map(([k, v, sub]) => (
           <div key={k} className="rounded-2xl bg-paper p-4">

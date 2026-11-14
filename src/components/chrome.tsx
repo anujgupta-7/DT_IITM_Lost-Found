@@ -58,7 +58,7 @@ function ping(n: 0 | 1, a = "") {
   if (location.pathname.startsWith("/admin")) return;
   const id = ids();
   if (!id) return;
-  const body = JSON.stringify({ ...id, p: location.pathname + location.search, n, a });
+  const body = JSON.stringify({ ...id, p: location.pathname + location.search, n, a, wd: navigator.webdriver ? 1 : 0 });
   try {
     fetch("/api/t", { method: "POST", body, keepalive: true, headers: { "content-type": "application/json" } }).catch(() => {});
   } catch {}
