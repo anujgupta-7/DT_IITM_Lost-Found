@@ -74,7 +74,21 @@ export function SavePost({ post }: { post: Omit<Post, "at"> }) {
 
 export function MyPosts() {
   const [posts, setPosts] = useState<Post[]>([]);
-  useEffect(() => setPosts(readPosts()), []);
+  useEffect(() => {
+    const all = readPosts();
+    if (!all.length) return;
+    const f = all.filter((p) => p.t === "found").map((p) => p.id).join(",");
+    const l = all.filter((p) => p.t === "lost").map((p) => p.id).join(",");
+    fetch(`/api/mine?f=${f}&l=${l}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((live: { f: string[]; l: string[] } | null) => {
+        if (!live) return;
+        const keep = all.filter((p) => (p.t === "found" ? live.f : live.l).includes(p.id));
+        try { localStorage.setItem("if_posts", JSON.stringify(keep)); } catch {}
+        setPosts(keep);
+      })
+      .catch(() => {});
+  }, []);
   if (!posts.length) return null;
   return (
     <section className="mb-5 rounded-2xl bg-paper p-4">
