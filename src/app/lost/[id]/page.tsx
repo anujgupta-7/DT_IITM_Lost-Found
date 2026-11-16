@@ -42,7 +42,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           <SavePost post={{ t: "lost", id: l.id, k: l.manage_token, title: l.title }} />
           <p className="display flex items-center gap-2 text-2xl font-extrabold"><Check className="h-7 w-7" strokeWidth={3} /> We&rsquo;re watching for it</p>
           <p className="mt-1 text-white/90">
-            {l.email && mailConfigured() ? `You'll get an email at ${l.email} when a matching item is posted.` : "Check back here for matches. This phone remembers your report."}
+            {l.email && mailConfigured() ? `You'll get an email at ${l.email} when a matching item is posted. That email also has the private link to this report, so you can close it from any phone, even if you clear your browser.` : "Check back here for matches. This phone remembers your report. Bookmark this page so you can still close it if you clear your browser."}
           </p>
         </section>
       )}

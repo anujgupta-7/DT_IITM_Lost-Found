@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   IdCard, KeyRound, Smartphone, Laptop, Headphones, Wallet, CupSoda, Umbrella, Shirt, Backpack, BookOpen,
-  Glasses, Watch, Calculator, Package, MapPin, Check, Hand, Building2,
+  Glasses, Watch, Calculator, Package, Bike, MapPin, Check, Hand, Building2,
 } from "lucide-react";
 import { catLabel, locLabel } from "@/lib/data";
 import { ago, fmtDay, maskRoll } from "@/lib/util";
@@ -10,7 +10,7 @@ import type { Item, Lost } from "@/lib/types";
 const ICONS: Record<string, typeof Package> = {
   id: IdCard, keys: KeyRound, phone: Smartphone, laptop: Laptop, audio: Headphones, wallet: Wallet, bottle: CupSoda,
   umbrella: Umbrella, clothing: Shirt, bag: Backpack, books: BookOpen, glasses: Glasses, watch: Watch,
-  stationery: Calculator, other: Package,
+  stationery: Calculator, cycle: Bike, other: Package,
 };
 
 export function CatIcon({ id, className }: { id: string; className?: string }) {

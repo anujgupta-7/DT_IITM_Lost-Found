@@ -150,7 +150,7 @@ export function PhotoInput({ onChange }: { onChange: (f: File | null, thumb: Fil
         >
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-marigold"><Camera className="h-7 w-7 text-banyan-deep" /></span>
           <span className="display text-lg font-bold">Take a photo</span>
-          <span className="text-sm text-muted">A photo helps the owner spot it fast</span>
+          <span className="text-sm text-muted">Needed, so the owner can recognise it</span>
         </button>
       )}
     </div>

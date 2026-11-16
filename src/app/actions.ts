@@ -42,6 +42,9 @@ export async function createFound(fd: FormData): Promise<Result> {
   if (finder_email && !validEmail(finder_email)) return { error: "That email doesn't look right." };
   if (holding === "finder" && !finder_email) return { error: "Add your email so the owner can reach you. It is never shown publicly." };
 
+  const pf = fd.get("photo");
+  if (category !== "id" && !(pf instanceof File && pf.size > 0)) return { error: "Add a photo of the item. It helps the owner recognise it." };
+
   const id = rid(8);
   const token = rid(16);
   const [photo, thumb] = category === "id" ? [null, null] : await Promise.all([

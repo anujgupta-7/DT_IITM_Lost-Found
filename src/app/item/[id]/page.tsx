@@ -59,7 +59,14 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             <a href={wa} target="_blank" rel="noopener" className="btn bg-white text-leaf"><MessageCircle className="h-5 w-5" /> Share on WhatsApp</a>
             {atDesk && <Link href="/found/new" className="btn bg-white/15 text-white ring-1 ring-white/40">Log another</Link>}
           </div>
-          {!atDesk && <p className="mt-3 text-sm text-white/85">This phone remembers your post. You&rsquo;ll find it on the home page under &ldquo;Your posts&rdquo;.</p>}
+          {!atDesk && (
+            <p className="mt-3 text-sm text-white/85">
+              This phone remembers your post under &ldquo;Your posts&rdquo; on the home page.{" "}
+              {i.finder_email && mailConfigured()
+                ? "We also emailed you a private link to it, so you can mark it returned from any phone, even if you clear your browser."
+                : "Bookmark this page so you can still mark it returned if you clear your browser."}
+            </p>
+          )}
         </section>
       )}
       {sp.done && returned && (

@@ -72,7 +72,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<SP>
         </div>
 
         <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1">
-          {CATEGORIES.slice(0, -1).map((c) => {
+          {CATEGORIES.map((c) => {
             const on = sp.cat === c.id;
             return (
               <Link key={c.id} href={href(sp, { cat: on ? undefined : c.id })}

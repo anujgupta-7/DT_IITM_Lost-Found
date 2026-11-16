@@ -15,6 +15,7 @@ export const CATEGORIES: Category[] = [
   { id: "glasses", label: "Spectacles", hint: "" },
   { id: "watch", label: "Watch or jewellery", hint: "" },
   { id: "stationery", label: "Calculator or stationery", hint: "" },
+  { id: "cycle", label: "Cycle", hint: "Bicycle, cycle lock" },
   { id: "other", label: "Something else", hint: "" },
 ];
 

@@ -84,7 +84,7 @@ export function FoundForm({
               <input name="title" className="field mt-3" placeholder="Other card? Describe it (optional)" maxLength={80} />
             </Step>
           ) : (
-            <Step n={2} title="Show it">
+            <Step n={2} title="Add a photo">
               <PhotoInput onChange={(f, t) => { setPhoto(f); setThumb(t); }} />
               <input name="title" defaultValue={lost?.title ?? ""} className="field mt-3" placeholder="Short description, like Black Milton bottle" maxLength={80} />
               {cat === "wallet" && <p className="mt-2 text-sm text-muted">Photograph only the outside. Keep cards and cash out of the picture.</p>}
